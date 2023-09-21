@@ -1,0 +1,57 @@
+---
+title: "Spotify PowerBI"
+output: html_document
+date: "2023-05-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+require(dplyr)
+require(stringr)
+getwd()
+Spotify <- read.csv("Code/spotifyData.csv")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+Spotify <- Spotify %>% mutate(broad.genre = top.genre)
+
+Spotify$broad.genre <- case_when(str_detect(Spotify$broad.genre,"pop") ~ 'pop', 
+          str_detect(Spotify$broad.genre,"hip hop") ~ 'hip hop',
+          str_detect(Spotify$broad.genre,fixed("r&b")) ~ 'r&b',
+          TRUE ~ Spotify$broad.genre)
+View(Spotify %>% select(top.genre, broad.genre))
+```
+
+```{r}
+Spotify <- Spotify %>% 
+  group_by(artist) %>%
+  mutate(count_artist=n()) %>%
+  ungroup()
+View(Spotify)
+```
+
+```{r}
+otify$hit_artists <- case_when(Spotify$count_artist == 1 ~ '1 Hit Wonders',
+                                  Spotify$count_artist <= 5 ~ '2-5 charters',
+                                  Spotify$count_artist <= 10 ~ '6-10 charters',
+                                  Spotify$count_artist >10 ~ 'Over 10 charters',
+                                  TRUE ~ "Spotify$hit_artists")
+View(Spotify %>% select(artist, count_artist, hit_artists))
+```
+
+```{r}
+write.csv(Spotify, file = "Code/Spotify.csv")
+```
+
